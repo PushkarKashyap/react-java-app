@@ -1,4 +1,4 @@
-package com.highradius;
+package com.highradius.internship.dao;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -13,7 +13,10 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class LoadCsv {
+import com.highradius.internship.utils.AppConstants;
+import com.highradius.internship.utils.DatabaseConnection;
+
+public class InvoiceDAO {
 	private static Float numberNullCheck(String ob) {
 		if (ob == null || ob.trim().isEmpty()) {
 			return new Float(0);
@@ -40,8 +43,8 @@ public class LoadCsv {
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
 		try {
-			Connect dbconn = new Connect(AppConstants.URL, AppConstants.DBNAME, AppConstants.USER, AppConstants.PASS);
-			connection = dbconn.getConnection();
+			DatabaseConnection dbconn = new DatabaseConnection(AppConstants.URL, AppConstants.DBNAME, AppConstants.USER, AppConstants.PASS);
+			connection = dbconn.initializeDatabase();
 			connection.setAutoCommit(false);
 			// creating prepared statement
 			String sql = AppConstants.LOADCSVQUERY;

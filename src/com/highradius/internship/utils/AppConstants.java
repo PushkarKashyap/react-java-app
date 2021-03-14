@@ -1,4 +1,4 @@
-package com.highradius;
+package com.highradius.internship.utils;
 
 public final class AppConstants {
 	public static final String URL = "jdbc:mysql://localhost:3306/";

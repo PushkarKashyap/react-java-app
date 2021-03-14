@@ -1,6 +1,7 @@
-package com.highradius;
+package com.highradius.internship.model;
 
-import java.sql.*;
+import java.sql.Date;
+import java.sql.Timestamp;
 
 public class Invoice {
 	private String business_code;

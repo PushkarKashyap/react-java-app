@@ -3,18 +3,11 @@ package com.highradius.internship.utils;
 import java.sql.*;
 
 public class DatabaseConnection {
-	String url = "";
-	String dbName = "";
-	String user = "";
-	String pass = "";
+	String url = AppConstants.URL;
+	String dbName = AppConstants.DBNAME;
+	String user = AppConstants.USER;
+	String pass = AppConstants.PASS;
 	Connection dbconn = null;
-
-	public DatabaseConnection(String url, String dbName, String user, String pass) {
-		this.url = url;
-		this.dbName = dbName;
-		this.user = user;
-		this.pass = pass;
-	}
 
 	public Connection initializeDatabase() {
 		try {

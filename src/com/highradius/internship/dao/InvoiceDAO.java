@@ -6,38 +6,31 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.highradius.internship.model.Invoice;
 import com.highradius.internship.utils.AppConstants;
 import com.highradius.internship.utils.DatabaseConnection;
 
 public class InvoiceDAO {
-	
-	//utils
-	private static Float numberNullCheck(String ob) {
-		if (ob == null || ob.trim().isEmpty()) {
-			return new Float(0);
-		} else {
-			return Float.parseFloat(ob);
-		}
+
+	// constructor
+	public InvoiceDAO() {
 	}
 
-	private static Object nullableCheck(String ob) {
-		if (ob == null || ob.trim().isEmpty()) {
-			return null;
-		} else {
-			return ob;
-		}
-	}
-	
-	//loadCSVonStartup
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+	// loadCSVonStartup
+	// function to load data on server startup
+	public void loadCSVonStartup() {
+		
+		String sql = AppConstants.LOADCSVQUERY;
 		String csvFilePath = AppConstants.CSV;
 		int batchSize = AppConstants.BATCHSIZE;
 		Connection connection = null;
@@ -50,7 +43,6 @@ public class InvoiceDAO {
 			connection = dbconn.initializeDatabase();
 			connection.setAutoCommit(false);
 			// creating prepared statement
-			String sql = AppConstants.LOADCSVQUERY;
 			PreparedStatement statement = connection.prepareStatement(sql);
 
 			BufferedReader lineReader = new BufferedReader(new FileReader(csvFilePath));
@@ -163,28 +155,144 @@ public class InvoiceDAO {
 			statement.executeBatch();
 
 			connection.commit();
-			connection.close();
+			
 			System.out.println("execution completed" + "\n");
 
 		} catch (IOException ex) {
 			System.out.println("IO Exception Encountered" + "\n");
 			System.err.println(ex);
 		} catch (SQLException ex) {
-			System.out.println("SQL Exception Encountered" + "\n");
-			ex.printStackTrace();
+			printSQLException(ex);
 
 			try {
 				System.out.println("Trying to Rollback" + "\n");
 				connection.rollback();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				printSQLException(ex);
 			}
 		} catch (Exception ex) {
-			// TODO Auto-generated catch block
 			System.out.println("Generic Exception Encountered" + "\n");
 			ex.printStackTrace();
 		}
+		finally {
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				printSQLException(e);
+			}
+			
+		}
 
 	}
+	
+	//function to list 50 invoices
+	public List<Invoice> listInvoices() throws SQLException {
+		String sql = AppConstants.LISTINVIOCES;
+		List<Invoice> invoiceList = new ArrayList<Invoice>();
+		Connection connection = null;
 
+		try {
+			connection = new DatabaseConnection().initializeDatabase();
+			PreparedStatement statement = connection.prepareStatement(sql);
+			ResultSet rs = statement.executeQuery();
+			
+			while (rs.next()) {
+				Invoice invoice = setModel(rs);
+				invoiceList.add(invoice);
+			}
+		} catch (SQLException ex) {
+			printSQLException(ex);
+
+			try {
+				System.out.println("Trying to Rollback" + "\n");
+				connection.rollback();
+			} catch (SQLException e) {
+				printSQLException(ex);
+			}
+		} catch (Exception ex) {
+			System.out.println("Generic Exception Encountered" + "\n");
+			ex.printStackTrace();
+		}
+		finally {
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				printSQLException(e);
+			}
+			
+		}
+
+		return invoiceList;
+	}
+
+	
+	// utils - start
+	//for loading CSV
+	private Float numberNullCheck(String ob) {
+		if (ob == null || ob.trim().isEmpty()) {
+			return new Float(0);
+		} else {
+			return Float.parseFloat(ob);
+		}
+	}
+
+	private Object nullableCheck(String ob) {
+		if (ob == null || ob.trim().isEmpty()) {
+			return null;
+		} else {
+			return ob;
+		}
+	}
+	
+	//for setting model
+	
+	private Invoice setModel(ResultSet rs) {
+		Invoice inv = new Invoice();
+		
+		try {
+			inv.setBusinessCode(rs.getString("business_code"));
+			inv.setCustNumber(rs.getString("cust_number"));
+			inv.setNameCustomer(rs.getString("name_customer"));
+			inv.setClearDate(rs.getTimestamp("clear_date"));
+			inv.setBusinessYear(rs.getFloat("business_year"));
+			inv.setDocId(rs.getDouble("doc_id"));
+			inv.setPostingDate(rs.getDate("posting_date"));
+			inv.setDocumentCreateDate(rs.getDate("document_create_date"));
+			inv.setDueInDate(rs.getDate("posting_date"));
+			inv.setInvoiceCurrency(rs.getString("invoice_currency"));
+			inv.setDocumentType(rs.getString("document_type"));
+			inv.setPostingId(rs.getFloat("posting_id"));
+			inv.setAreaBusiness(rs.getString("area_business"));
+			inv.setTotalOpenAmount(rs.getFloat("total_open_amount"));
+			inv.setBaselineCreateDate(rs.getDate("baseline_create_date"));
+			inv.setCustPaymentTerms(rs.getString("cust_payment_terms"));
+			inv.setInvoiceId(rs.getFloat("invoice_id"));
+			inv.setIsOpen(rs.getFloat("isOpen"));
+		} catch (SQLException ex) {
+			printSQLException(ex);
+		} catch (Exception ex) {
+			System.out.println("Generic Exception Encountered" + "\n");
+			ex.printStackTrace();
+		}
+		return inv;
+	}
+	
+	//printing formatted SQL exception
+	private void printSQLException(SQLException ex) {
+		for (Throwable e : ex) {
+			if (e instanceof SQLException) {
+				e.printStackTrace(System.err);
+				System.err.println("SQLState: " + ((SQLException) e).getSQLState() + "\n");
+				System.err.println("Error Code: " + ((SQLException) e).getErrorCode() + "\n");
+				System.err.println("Message: " + e.getMessage() + "\n");
+				Throwable t = ex.getCause();
+				while (t != null) {
+					System.out.println("Cause: " + t + "\n");
+					t = t.getCause();
+				}
+			}
+		}
+	}
+	
+	// utils - end
 }

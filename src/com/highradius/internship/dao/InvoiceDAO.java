@@ -26,24 +26,27 @@ public class InvoiceDAO {
 	public InvoiceDAO() {
 	}
 
+	private Connection jdbcConnection;
+	private PreparedStatement statement;
+	private ResultSet rs;
+
 	// loadCSVonStartup
 	// function to load data on server startup
 	public void loadCSVonStartup() {
-		
+
 		String sql = AppConstants.LOADCSVQUERY;
 		String csvFilePath = AppConstants.CSV;
 		int batchSize = AppConstants.BATCHSIZE;
-		Connection connection = null;
 		// date formats
 		DateFormat dateFormatHMS = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
 		try {
 			DatabaseConnection dbconn = new DatabaseConnection();
-			connection = dbconn.initializeDatabase();
-			connection.setAutoCommit(false);
+			jdbcConnection = dbconn.initializeDatabase();
+			jdbcConnection.setAutoCommit(false);
 			// creating prepared statement
-			PreparedStatement statement = connection.prepareStatement(sql);
+			PreparedStatement statement = jdbcConnection.prepareStatement(sql);
 
 			BufferedReader lineReader = new BufferedReader(new FileReader(csvFilePath));
 			String lineText = null;
@@ -154,8 +157,8 @@ public class InvoiceDAO {
 			// execute the remaining queries
 			statement.executeBatch();
 
-			connection.commit();
-			
+			jdbcConnection.commit();
+
 			System.out.println("execution completed" + "\n");
 
 		} catch (IOException ex) {
@@ -166,36 +169,34 @@ public class InvoiceDAO {
 
 			try {
 				System.out.println("Trying to Rollback" + "\n");
-				connection.rollback();
+				jdbcConnection.rollback();
 			} catch (SQLException e) {
 				printSQLException(ex);
 			}
 		} catch (Exception ex) {
 			System.out.println("Generic Exception Encountered" + "\n");
 			ex.printStackTrace();
-		}
-		finally {
+		} finally {
 			try {
-				connection.close();
+				disconnect();
 			} catch (SQLException e) {
 				printSQLException(e);
 			}
-			
+
 		}
 
 	}
-	
-	//function to list 50 invoices
+
+	// function to list 50 invoices
 	public List<Invoice> listInvoices() throws SQLException {
 		String sql = AppConstants.LISTINVIOCES;
 		List<Invoice> invoiceList = new ArrayList<Invoice>();
-		Connection connection = null;
 
 		try {
-			connection = new DatabaseConnection().initializeDatabase();
-			PreparedStatement statement = connection.prepareStatement(sql);
+			jdbcConnection = new DatabaseConnection().initializeDatabase();
+			PreparedStatement statement = jdbcConnection.prepareStatement(sql);
 			ResultSet rs = statement.executeQuery();
-			
+
 			while (rs.next()) {
 				Invoice invoice = setModel(rs);
 				invoiceList.add(invoice);
@@ -205,29 +206,27 @@ public class InvoiceDAO {
 
 			try {
 				System.out.println("Trying to Rollback" + "\n");
-				connection.rollback();
+				jdbcConnection.rollback();
 			} catch (SQLException e) {
 				printSQLException(ex);
 			}
 		} catch (Exception ex) {
 			System.out.println("Generic Exception Encountered" + "\n");
 			ex.printStackTrace();
-		}
-		finally {
+		} finally {
 			try {
-				connection.close();
+				disconnect();
 			} catch (SQLException e) {
 				printSQLException(e);
 			}
-			
+
 		}
 
 		return invoiceList;
 	}
 
-	
 	// utils - start
-	//for loading CSV
+	// for loading CSV
 	private Float numberNullCheck(String ob) {
 		if (ob == null || ob.trim().isEmpty()) {
 			return new Float(0);
@@ -243,12 +242,12 @@ public class InvoiceDAO {
 			return ob;
 		}
 	}
-	
-	//for setting model
-	
+
+	// for setting model
+
 	private Invoice setModel(ResultSet rs) {
 		Invoice inv = new Invoice();
-		
+
 		try {
 			inv.setBusinessCode(rs.getString("business_code"));
 			inv.setCustNumber(rs.getString("cust_number"));
@@ -276,8 +275,8 @@ public class InvoiceDAO {
 		}
 		return inv;
 	}
-	
-	//printing formatted SQL exception
+
+	// printing formatted SQL exception
 	private void printSQLException(SQLException ex) {
 		for (Throwable e : ex) {
 			if (e instanceof SQLException) {
@@ -293,6 +292,21 @@ public class InvoiceDAO {
 			}
 		}
 	}
-	
+
+	// close connections
+	private void disconnect() throws SQLException {
+		if(rs != null && !rs.isClosed())
+		{
+			rs.close();
+		}
+		if (statement != null && !statement.isClosed())
+		{
+			statement.close();
+		}
+		if (jdbcConnection != null && !jdbcConnection.isClosed()) {
+			jdbcConnection.close();
+		}
+	}
+
 	// utils - end
 }

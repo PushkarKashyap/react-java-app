@@ -38,7 +38,7 @@ public class InvoiceDAO {
 		String csvFilePath = AppConstants.CSV;
 		int batchSize = AppConstants.BATCHSIZE;
 		// date formats
-		DateFormat dateFormatHMS = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+		DateFormat dateFormatHMS = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
 		try {

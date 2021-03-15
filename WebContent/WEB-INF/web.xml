@@ -35,13 +35,13 @@
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 
-	<servlet>
+<!-- 	<servlet>
 		<servlet-name>DummyServlet</servlet-name>
 		<servlet-class>com.higradius.DummyServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>DummyServlet</servlet-name>
 		<url-pattern>/dummy.do</url-pattern>
-	</servlet-mapping>
+	</servlet-mapping> -->
 
 </web-app>

@@ -263,14 +263,15 @@ public class InvoiceDAO {
 		return invoiceList;
 	}
 	
-	public boolean deleteInvoice(String invoiceId) throws SQLException {
+	public boolean deleteInvoice(String docId) throws SQLException {
 		String sql = AppConstants.DELETEINVOICE;
 		boolean isSuccess = false;
 
 		try {
 			jdbcConnection = new DatabaseConnection().initializeDatabase();
+			jdbcConnection.setAutoCommit(false);
 			PreparedStatement statement = jdbcConnection.prepareStatement(sql);
-			statement.setString(1, invoiceId);
+			statement.setString(1, docId);
 			isSuccess = statement.executeUpdate() > 0;
 			jdbcConnection.commit();
 

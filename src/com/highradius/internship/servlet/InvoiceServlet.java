@@ -20,7 +20,7 @@ import com.highradius.internship.model.Invoice;
 /**
  * Servlet implementation class InvoiceServlet
  */
-@WebServlet("/InvoiceServlet")
+@WebServlet("/")
 public class InvoiceServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -63,7 +63,8 @@ public class InvoiceServlet extends HttpServlet {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		// response.getWriter().append("Served at: ").append(request.getContextPath());
-		String action = request.getServletPath();
+		//String action = request.getServletPath();
+		String action = request.getPathInfo();
 
 		try {
 			switch (action) {
@@ -137,12 +138,12 @@ public class InvoiceServlet extends HttpServlet {
 	private void deleteInvoice(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, IOException {
 		// hardcoding for testing
-		String invoiceId = "1928501760,1930193894,1928712477";
+		String docId = "1928501756";
 		//List<Invoice> invoiceList = new ArrayList<Invoice>();
 		boolean isSuccess = false;
 		try {
 			InvoiceDAO invoiceDAO = new InvoiceDAO();
-			isSuccess = invoiceDAO.deleteInvoice(invoiceId);
+			isSuccess = invoiceDAO.deleteInvoice(docId);
 		} catch (SQLException e) {
 			throw e;
 		}

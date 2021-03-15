@@ -31,17 +31,18 @@ public class InvoiceServlet extends HttpServlet {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
-	public void init(ServletConfig config) throws ServletException  {
+
+	public void init(ServletConfig config) throws ServletException {
 		System.out.println("----------Initializing app-------------");
 		try {
+			//comment this if not required
 			InvoiceDAO invoiceDAO = new InvoiceDAO();
 			invoiceDAO.loadCSVonStartup();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ServletException(e);
 		}
-        System.out.println("----------App initialized successfully-------------");
+		System.out.println("----------App initialized successfully-------------");
 	}
 
 	/**
@@ -61,7 +62,7 @@ public class InvoiceServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//response.getWriter().append("Served at: ").append(request.getContextPath());
+		// response.getWriter().append("Served at: ").append(request.getContextPath());
 		String action = request.getServletPath();
 
 		try {
@@ -69,10 +70,10 @@ public class InvoiceServlet extends HttpServlet {
 			case "/add":
 				addInvoice(request, response);
 				break;
-			case "/insert":
+			case "/delete":
 				deleteInvoice(request, response);
 				break;
-			case "/delete":
+			case "/search":
 				searchInvoice(request, response);
 				break;
 			case "/update":
@@ -89,7 +90,7 @@ public class InvoiceServlet extends HttpServlet {
 
 	private void listInvoices(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, IOException {
-		
+
 		List<Invoice> invoiceList = new ArrayList<Invoice>();
 		try {
 			InvoiceDAO invoiceDAO = new InvoiceDAO();
@@ -114,13 +115,44 @@ public class InvoiceServlet extends HttpServlet {
 
 	private void searchInvoice(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, IOException {
-		// TODO Auto-generated method stub
 
+		// hardcoding for testing
+		String invoiceId = "1928501760";
+		List<Invoice> invoiceList = new ArrayList<Invoice>();
+		try {
+			InvoiceDAO invoiceDAO = new InvoiceDAO();
+			invoiceList = invoiceDAO.searchInvoice(invoiceId);
+		} catch (SQLException e) {
+			throw e;
+		}
+		Gson gson = new Gson();
+		String data = gson.toJson(invoiceList);
+		PrintWriter out = response.getWriter();
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		out.print(data);
+		out.flush();
 	}
 
 	private void deleteInvoice(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, IOException {
-		// TODO Auto-generated method stub
+		// hardcoding for testing
+		String invoiceId = "1928501760,1930193894,1928712477";
+		//List<Invoice> invoiceList = new ArrayList<Invoice>();
+		boolean isSuccess = false;
+		try {
+			InvoiceDAO invoiceDAO = new InvoiceDAO();
+			isSuccess = invoiceDAO.deleteInvoice(invoiceId);
+		} catch (SQLException e) {
+			throw e;
+		}
+		Gson gson = new Gson();
+		String data = gson.toJson(isSuccess);
+		PrintWriter out = response.getWriter();
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		out.print(data);
+		out.flush();
 
 	}
 

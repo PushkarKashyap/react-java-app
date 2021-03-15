@@ -224,6 +224,79 @@ public class InvoiceDAO {
 
 		return invoiceList;
 	}
+	
+	public List<Invoice> searchInvoice(String invoiceId) throws SQLException {
+		String sql = AppConstants.SEARCHINVOICE;
+		List<Invoice> invoiceList = new ArrayList<Invoice>();
+
+		try {
+			jdbcConnection = new DatabaseConnection().initializeDatabase();
+			PreparedStatement statement = jdbcConnection.prepareStatement(sql);
+			statement.setString(1, invoiceId);
+			ResultSet rs = statement.executeQuery();
+
+			while (rs.next()) {
+				Invoice invoice = setModel(rs);
+				invoiceList.add(invoice);
+			}
+		} catch (SQLException ex) {
+			printSQLException(ex);
+
+			try {
+				System.out.println("Trying to Rollback" + "\n");
+				jdbcConnection.rollback();
+			} catch (SQLException e) {
+				printSQLException(ex);
+			}
+		} catch (Exception ex) {
+			System.out.println("Generic Exception Encountered" + "\n");
+			ex.printStackTrace();
+		} finally {
+			try {
+				disconnect();
+			} catch (SQLException e) {
+				printSQLException(e);
+			}
+
+		}
+
+		return invoiceList;
+	}
+	
+	public boolean deleteInvoice(String invoiceId) throws SQLException {
+		String sql = AppConstants.DELETEINVOICE;
+		boolean isSuccess = false;
+
+		try {
+			jdbcConnection = new DatabaseConnection().initializeDatabase();
+			PreparedStatement statement = jdbcConnection.prepareStatement(sql);
+			statement.setString(1, invoiceId);
+			isSuccess = statement.executeUpdate() > 0;
+			jdbcConnection.commit();
+
+		} catch (SQLException ex) {
+			printSQLException(ex);
+
+			try {
+				System.out.println("Trying to Rollback" + "\n");
+				jdbcConnection.rollback();
+			} catch (SQLException e) {
+				printSQLException(ex);
+			}
+		} catch (Exception ex) {
+			System.out.println("Generic Exception Encountered" + "\n");
+			ex.printStackTrace();
+		} finally {
+			try {
+				disconnect();
+			} catch (SQLException e) {
+				printSQLException(e);
+			}
+
+		}
+
+		return isSuccess;
+	}
 
 	// utils - start
 	// for loading CSV

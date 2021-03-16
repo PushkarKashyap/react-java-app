@@ -38,8 +38,8 @@ public class InvoiceDAO {
 		String csvFilePath = AppConstants.CSV;
 		int batchSize = AppConstants.BATCHSIZE;
 		// date formats
-		DateFormat dateFormatHMS = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+		DateFormat dateFormatHMS = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		try {
 			DatabaseConnection dbconn = new DatabaseConnection();
@@ -263,15 +263,33 @@ public class InvoiceDAO {
 		return invoiceList;
 	}
 	
-	public boolean deleteInvoice(String docId) throws SQLException {
-		String sql = AppConstants.DELETEINVOICE;
+	//for dynamic query creation based on the number of inputs 
+	private static String createQuery(int length) {
+		String query = AppConstants.DELETEINVOICE;
+		StringBuilder queryBuilder = new StringBuilder(query);
+		for( int i = 0; i< length; i++){
+			queryBuilder.append(" ?");
+			if(i != length -1) queryBuilder.append(",");
+		}
+		queryBuilder.append(")");
+		return queryBuilder.toString();
+	}
+	
+	public boolean deleteInvoice(String[] docList) throws SQLException {
 		boolean isSuccess = false;
 
 		try {
 			jdbcConnection = new DatabaseConnection().initializeDatabase();
 			jdbcConnection.setAutoCommit(false);
-			PreparedStatement statement = jdbcConnection.prepareStatement(sql);
-			statement.setString(1, docId);
+			String query = createQuery(docList.length);
+			PreparedStatement statement = jdbcConnection.prepareStatement(query);
+
+			System.out.println("Query="+query);
+			
+			for(int i = 1; i <=docList.length; i++){
+				statement.setString(i, docList[i-1]);
+			}
+			
 			isSuccess = statement.executeUpdate() > 0;
 			jdbcConnection.commit();
 

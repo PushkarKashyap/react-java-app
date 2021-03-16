@@ -118,7 +118,8 @@ public class InvoiceServlet extends HttpServlet {
 			throws SQLException, IOException {
 
 		// hardcoding for testing
-		String invoiceId = "1928501760";
+		//String invoiceId = "1928501760";
+		String invoiceId = request.getParameter("invoiceId");
 		List<Invoice> invoiceList = new ArrayList<Invoice>();
 		try {
 			InvoiceDAO invoiceDAO = new InvoiceDAO();
@@ -138,12 +139,13 @@ public class InvoiceServlet extends HttpServlet {
 	private void deleteInvoice(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, IOException {
 		// hardcoding for testing
-		String docId = "1928501756";
+		//String docId = "1928501756";
+		String[] docList =  (request.getParameter("docList")).split("\\,");
 		//List<Invoice> invoiceList = new ArrayList<Invoice>();
 		boolean isSuccess = false;
 		try {
 			InvoiceDAO invoiceDAO = new InvoiceDAO();
-			isSuccess = invoiceDAO.deleteInvoice(docId);
+			isSuccess = invoiceDAO.deleteInvoice(docList);
 		} catch (SQLException e) {
 			throw e;
 		}

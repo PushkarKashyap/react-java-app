@@ -46,7 +46,7 @@ public class InvoiceDAO {
 			jdbcConnection = dbconn.initializeDatabase();
 			jdbcConnection.setAutoCommit(false);
 			// creating prepared statement
-			PreparedStatement statement = jdbcConnection.prepareStatement(sql);
+			statement = jdbcConnection.prepareStatement(sql);
 
 			BufferedReader lineReader = new BufferedReader(new FileReader(csvFilePath));
 			String lineText = null;
@@ -85,7 +85,7 @@ public class InvoiceDAO {
 					statement.setTimestamp(4, null);
 				}
 
-				statement.setFloat(5, Float.parseFloat(numberNullCheck(businessYear).toString()));
+				statement.setDouble(5, Double.parseDouble(numberNullCheck(businessYear).toString()));
 
 				// Double lDoc_id = Double.parseDouble(doc_id);
 				// System.out.println("doc id: "+lDoc_id);
@@ -118,13 +118,13 @@ public class InvoiceDAO {
 				statement.setString(10, invoiceCurrency);
 				statement.setString(11, documentType);
 
-				Float fPostingId = Float.parseFloat(numberNullCheck(postingId).toString());
-				statement.setFloat(12, fPostingId);
+				Double dPostingId = Double.parseDouble(numberNullCheck(postingId).toString());
+				statement.setDouble(12, dPostingId);
 
 				statement.setString(13, areaBusiness);
 
-				Float fTotalOpen = Float.parseFloat(numberNullCheck(totalOpenAmount).toString());
-				statement.setFloat(14, fTotalOpen);
+				Double dTotalOpen = Double.parseDouble(numberNullCheck(totalOpenAmount).toString());
+				statement.setDouble(14, dTotalOpen);
 
 				if (nullableCheck(baselineCreateDate) != null) {
 					LocalDate dBaselineCreateDate = LocalDate.parse(
@@ -137,11 +137,11 @@ public class InvoiceDAO {
 
 				statement.setString(16, custPaymentTerms);
 
-				Float fInvoiceId = Float.parseFloat(numberNullCheck(invoiceId).toString());
-				statement.setFloat(17, fInvoiceId);
+				Double dInvoiceId = Double.parseDouble(numberNullCheck(invoiceId).toString());
+				statement.setDouble(17, dInvoiceId);
 
-				Float fIsOpen = Float.parseFloat(numberNullCheck(isOpen).toString());
-				statement.setFloat(18, fIsOpen);
+				Double dIsOpen = Double.parseDouble(numberNullCheck(isOpen).toString());
+				statement.setDouble(18, dIsOpen);
 
 				statement.addBatch();
 				count++;
@@ -194,8 +194,8 @@ public class InvoiceDAO {
 
 		try {
 			jdbcConnection = new DatabaseConnection().initializeDatabase();
-			PreparedStatement statement = jdbcConnection.prepareStatement(sql);
-			ResultSet rs = statement.executeQuery();
+			statement = jdbcConnection.prepareStatement(sql);
+			rs = statement.executeQuery();
 
 			while (rs.next()) {
 				Invoice invoice = setModel(rs);
@@ -231,9 +231,9 @@ public class InvoiceDAO {
 
 		try {
 			jdbcConnection = new DatabaseConnection().initializeDatabase();
-			PreparedStatement statement = jdbcConnection.prepareStatement(sql);
+			statement = jdbcConnection.prepareStatement(sql);
 			statement.setString(1, invoiceId);
-			ResultSet rs = statement.executeQuery();
+			rs = statement.executeQuery();
 
 			while (rs.next()) {
 				Invoice invoice = setModel(rs);
@@ -316,14 +316,102 @@ public class InvoiceDAO {
 
 		return isSuccess;
 	}
+	
+	public boolean updateInvoice(String docId, String notes) throws SQLException {
+		boolean isSuccess = false;
+
+		try {
+			jdbcConnection = new DatabaseConnection().initializeDatabase();
+			jdbcConnection.setAutoCommit(false);
+			String query = AppConstants.UPDATEINVOICE;
+			statement = jdbcConnection.prepareStatement(query);
+			
+			System.out.println("Query="+query);
+			
+			statement.setString(1, notes);
+			statement.setString(2, docId);
+
+			isSuccess = statement.executeUpdate() > 0;
+			jdbcConnection.commit();
+
+		} catch (SQLException ex) {
+			printSQLException(ex);
+
+			try {
+				System.out.println("Trying to Rollback" + "\n");
+				jdbcConnection.rollback();
+			} catch (SQLException e) {
+				printSQLException(ex);
+			}
+		} catch (Exception ex) {
+			System.out.println("Generic Exception Encountered" + "\n");
+			ex.printStackTrace();
+		} finally {
+			try {
+				disconnect();
+			} catch (SQLException e) {
+				printSQLException(e);
+			}
+
+		}
+
+		return isSuccess;
+	}
+	
+		
+	public boolean addInvoice(Invoice inv) throws SQLException {
+		boolean isSuccess = false;
+
+		try {
+			jdbcConnection = new DatabaseConnection().initializeDatabase();
+			jdbcConnection.setAutoCommit(false);
+			String query = AppConstants.ADDINVOICE;
+			statement = jdbcConnection.prepareStatement(query);
+			
+			System.out.println("Query="+query);
+			
+			statement.setDouble(1, inv.getDocId());
+			statement.setString(2, inv.getCustNumber());
+			statement.setString(3, inv.getNameCustomer());
+			statement.setDate(4, inv.getDueInDate());
+			statement.setDouble(5,  inv.getTotalOpenAmount());
+			statement.setDouble(6,  inv.getInvoiceId());
+			statement.setString(7,  inv.getNotes());
+
+			isSuccess = statement.executeUpdate() > 0;
+			jdbcConnection.commit();
+
+		} catch (SQLException ex) {
+			printSQLException(ex);
+
+			try {
+				System.out.println("Trying to Rollback" + "\n");
+				jdbcConnection.rollback();
+			} catch (SQLException e) {
+				printSQLException(ex);
+			}
+		} catch (Exception ex) {
+			System.out.println("Generic Exception Encountered" + "\n");
+			ex.printStackTrace();
+		} finally {
+			try {
+				disconnect();
+			} catch (SQLException e) {
+				printSQLException(e);
+			}
+
+		}
+
+		return isSuccess;
+	}
 
 	// utils - start
 	// for loading CSV
-	private Float numberNullCheck(String ob) {
+	private Double numberNullCheck(String ob) {
 		if (ob == null || ob.trim().isEmpty()) {
-			return new Float(0);
+			return new Double(0);
 		} else {
-			return Float.parseFloat(ob);
+			return Double.parseDouble(ob);
 		}
 	}
 
@@ -345,20 +433,20 @@ public class InvoiceDAO {
 			inv.setCustNumber(rs.getString("cust_number"));
 			inv.setNameCustomer(rs.getString("name_customer"));
 			inv.setClearDate(rs.getTimestamp("clear_date"));
-			inv.setBusinessYear(rs.getFloat("business_year"));
+			inv.setBusinessYear(rs.getDouble("business_year"));
 			inv.setDocId(rs.getDouble("doc_id"));
 			inv.setPostingDate(rs.getDate("posting_date"));
 			inv.setDocumentCreateDate(rs.getDate("document_create_date"));
 			inv.setDueInDate(rs.getDate("posting_date"));
 			inv.setInvoiceCurrency(rs.getString("invoice_currency"));
 			inv.setDocumentType(rs.getString("document_type"));
-			inv.setPostingId(rs.getFloat("posting_id"));
+			inv.setPostingId(rs.getDouble("posting_id"));
 			inv.setAreaBusiness(rs.getString("area_business"));
-			inv.setTotalOpenAmount(rs.getFloat("total_open_amount"));
+			inv.setTotalOpenAmount(rs.getDouble("total_open_amount"));
 			inv.setBaselineCreateDate(rs.getDate("baseline_create_date"));
 			inv.setCustPaymentTerms(rs.getString("cust_payment_terms"));
-			inv.setInvoiceId(rs.getFloat("invoice_id"));
-			inv.setIsOpen(rs.getFloat("isOpen"));
+			inv.setInvoiceId(rs.getDouble("invoice_id"));
+			inv.setIsOpen(rs.getDouble("isOpen"));
 		} catch (SQLException ex) {
 			printSQLException(ex);
 		} catch (Exception ex) {

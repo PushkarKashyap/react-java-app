@@ -8,20 +8,61 @@ public class Invoice {
 	private String custNumber;
 	private String nameCustomer;
 	private Timestamp clearDate;
-	private Float businessYear;
+	private Double businessYear;
 	private Double docId;
 	private Date postingDate;
 	private Date documentCreateDate;
 	private Date dueInDate;
 	private String invoiceCurrency;
 	private String documentType;
-	private Float postingId;
+	private Double postingId;
 	private String areaBusiness;
-	private Float totalOpenAmount;
+	private Double totalOpenAmount;
 	private Date baselineCreateDate;
 	private String custPaymentTerms;
-	private Float invoiceId;
-	private Float isOpen;
+	private Double invoiceId;
+	private Double isOpen;
+	private String notes;
+
+	public Double getBusinessYear() {
+		return businessYear;
+	}
+
+	public void setBusinessYear(Double businessYear) {
+		this.businessYear = businessYear;
+	}
+
+	public Double getPostingId() {
+		return postingId;
+	}
+
+	public void setPostingId(Double postingId) {
+		this.postingId = postingId;
+	}
+
+	public Double getTotalOpenAmount() {
+		return totalOpenAmount;
+	}
+
+	public void setTotalOpenAmount(Double totalOpenAmount) {
+		this.totalOpenAmount = totalOpenAmount;
+	}
+
+	public Double getInvoiceId() {
+		return invoiceId;
+	}
+
+	public void setInvoiceId(Double invoiceId) {
+		this.invoiceId = invoiceId;
+	}
+
+	public Double getIsOpen() {
+		return isOpen;
+	}
+
+	public void setIsOpen(Double isOpen) {
+		this.isOpen = isOpen;
+	}
 
 	public String getBusinessCode() {
 		return businessCode;
@@ -53,14 +94,6 @@ public class Invoice {
 
 	public void setClearDate(Timestamp clearDate) {
 		this.clearDate = clearDate;
-	}
-
-	public Float getBusinessYear() {
-		return businessYear;
-	}
-
-	public void setBusinessYear(Float businessYear) {
-		this.businessYear = businessYear;
 	}
 
 	public Double getDocId() {
@@ -111,28 +144,12 @@ public class Invoice {
 		this.documentType = documentType;
 	}
 
-	public Float getPostingId() {
-		return postingId;
-	}
-
-	public void setPostingId(Float postingId) {
-		this.postingId = postingId;
-	}
-
 	public String getAreaBusiness() {
 		return areaBusiness;
 	}
 
 	public void setAreaBusiness(String areaBusiness) {
 		this.areaBusiness = areaBusiness;
-	}
-
-	public Float getTotalOpenAmount() {
-		return totalOpenAmount;
-	}
-
-	public void setTotalOpenAmount(Float totalOpenAmount) {
-		this.totalOpenAmount = totalOpenAmount;
 	}
 
 	public Date getBaselineCreateDate() {
@@ -151,20 +168,12 @@ public class Invoice {
 		this.custPaymentTerms = custPaymentTerms;
 	}
 
-	public Float getInvoiceId() {
-		return invoiceId;
+	public String getNotes() {
+		return notes;
 	}
 
-	public void setInvoiceId(Float invoiceId) {
-		this.invoiceId = invoiceId;
-	}
-
-	public Float getIsOpen() {
-		return isOpen;
-	}
-
-	public void setIsOpen(Float isOpen) {
-		this.isOpen = isOpen;
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 
 }

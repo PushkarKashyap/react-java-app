@@ -16,4 +16,6 @@ public final class AppConstants {
 	public static final String LISTINVIOCES = "SELECT * FROM invoice_details LIMIT 50";
 	public static final String SEARCHINVOICE = "SELECT * FROM invoice_details where invoice_id in (?)";
 	public static final String DELETEINVOICE = "DELETE FROM invoice_details where doc_id in (";
+	public static final String UPDATEINVOICE = "UPDATE invoice_details set notes = ? where doc_id = ?";
+	public static final String ADDINVOICE = "INSERT INTO invoice_details (doc_id, cust_number, name_customer, due_in_date, total_open_amount, invoice_id, notes) VALUES(? , ? , ? , ? , ? , ? , ? )";
 }

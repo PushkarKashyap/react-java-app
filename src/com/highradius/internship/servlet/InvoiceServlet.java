@@ -177,10 +177,10 @@ public class InvoiceServlet extends HttpServlet {
 	private void addInvoice(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, IOException, ParseException {
 		Invoice inv = new Invoice();
-		inv.setDocId(Double.parseDouble(request.getParameter("docId")));
+		inv.setDocId(Double.parseDouble(request.getParameter("invoiceId")));
 		inv.setNameCustomer(request.getParameter("nameCustomer"));
 		inv.setCustNumber(request.getParameter("custNumber"));
-		inv.setInvoiceId(Double.parseDouble(request.getParameter("docId")));
+		inv.setInvoiceId(Double.parseDouble(request.getParameter("invoiceId")));
 		inv.setTotalOpenAmount(Double.parseDouble(request.getParameter("totalOpenAmount")));
 		inv.setDueInDate(
 				new Date(new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dueInDate")).getTime()));

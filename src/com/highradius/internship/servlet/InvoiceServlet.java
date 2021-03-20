@@ -95,44 +95,42 @@ public class InvoiceServlet extends HttpServlet {
 
 		List<Invoice> invoiceList = new ArrayList<Invoice>();
 		String pageCount = "0";
-		if (request.getParameterMap().containsKey("page"))
-		{
+		if (request.getParameterMap().containsKey("page")) {
 			pageCount = (request.getParameter("page").isEmpty()) ? "0" : request.getParameter("page");
 		}
-		
+
 		try {
 			InvoiceDAO invoiceDAO = new InvoiceDAO();
 			invoiceList = invoiceDAO.listInvoices(pageCount);
 		} catch (Exception e) {
 			throw e;
 		}
-		Gson gson = new Gson();
-		String data = gson.toJson(invoiceList);
-		PrintWriter out = response.getWriter();
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		out.print(data);
-		out.flush();
+		setOutput(invoiceList, request, response);
+		/*
+		 * Gson gson = new Gson(); String data = gson.toJson(invoiceList); PrintWriter
+		 * out = response.getWriter(); response.setContentType("application/json");
+		 * response.setCharacterEncoding("UTF-8"); out.print(data); out.flush();
+		 */
 	}
 
 	private void updateInvoice(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, IOException {
 		String docId = request.getParameter("docId");
+		String totalOpenAmount = request.getParameter("totalOpenAmount");
 		String notes = request.getParameter("notes");
 		boolean isSuccess = false;
 		try {
 			InvoiceDAO invoiceDAO = new InvoiceDAO();
-			isSuccess = invoiceDAO.updateInvoice(docId, notes);
+			isSuccess = invoiceDAO.updateInvoice(docId, totalOpenAmount, notes);
 		} catch (Exception e) {
 			throw e;
 		}
-		Gson gson = new Gson();
-		String data = gson.toJson(isSuccess);
-		PrintWriter out = response.getWriter();
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		out.print(data);
-		out.flush();
+		setOutput(isSuccess, request, response);
+		/*
+		 * Gson gson = new Gson(); String data = gson.toJson(isSuccess); PrintWriter out
+		 * = response.getWriter(); response.setContentType("application/json");
+		 * response.setCharacterEncoding("UTF-8"); out.print(data); out.flush();
+		 */
 	}
 
 	private void searchInvoice(HttpServletRequest request, HttpServletResponse response)
@@ -145,13 +143,12 @@ public class InvoiceServlet extends HttpServlet {
 		} catch (Exception e) {
 			throw e;
 		}
-		Gson gson = new Gson();
-		String data = gson.toJson(invoiceList);
-		PrintWriter out = response.getWriter();
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		out.print(data);
-		out.flush();
+		setOutput(invoiceList, request, response);
+		/*
+		 * Gson gson = new Gson(); String data = gson.toJson(invoiceList); PrintWriter
+		 * out = response.getWriter(); response.setContentType("application/json");
+		 * response.setCharacterEncoding("UTF-8"); out.print(data); out.flush();
+		 */
 	}
 
 	private void deleteInvoice(HttpServletRequest request, HttpServletResponse response)
@@ -164,13 +161,12 @@ public class InvoiceServlet extends HttpServlet {
 		} catch (Exception e) {
 			throw e;
 		}
-		Gson gson = new Gson();
-		String data = gson.toJson(isSuccess);
-		PrintWriter out = response.getWriter();
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		out.print(data);
-		out.flush();
+		setOutput(isSuccess, request, response);
+		/*
+		 * Gson gson = new Gson(); String data = gson.toJson(isSuccess); PrintWriter out
+		 * = response.getWriter(); response.setContentType("application/json");
+		 * response.setCharacterEncoding("UTF-8"); out.print(data); out.flush();
+		 */
 
 	}
 
@@ -193,14 +189,24 @@ public class InvoiceServlet extends HttpServlet {
 		} catch (Exception e) {
 			throw e;
 		}
+		setOutput(isSuccess, request, response);
+		/*
+		 * Gson gson = new Gson(); String data = gson.toJson(isSuccess); PrintWriter out
+		 * = response.getWriter(); response.setContentType("application/json");
+		 * response.setCharacterEncoding("UTF-8"); out.print(data); out.flush();
+		 */
+
+	}
+
+	private void setOutput(Object ret, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, IOException {
 		Gson gson = new Gson();
-		String data = gson.toJson(isSuccess);
+		String data = gson.toJson(ret);
 		PrintWriter out = response.getWriter();
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		out.print(data);
 		out.flush();
-
 	}
 
 }

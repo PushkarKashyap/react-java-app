@@ -269,7 +269,8 @@ public class InvoiceDAO {
 		StringBuilder queryBuilder = new StringBuilder(query);
 		for (int i = 0; i < length; i++) {
 			queryBuilder.append(" ?");
-			if(i != length -1) queryBuilder.append(",");
+			if (i != length - 1)
+				queryBuilder.append(",");
 		}
 		queryBuilder.append(")");
 		return queryBuilder.toString();
@@ -317,7 +318,7 @@ public class InvoiceDAO {
 		return isSuccess;
 	}
 
-	public boolean updateInvoice(String docId, String notes) throws SQLException {
+	public boolean updateInvoice(String docId, String totalOpenAmount, String notes) throws SQLException {
 		boolean isSuccess = false;
 
 		try {
@@ -329,7 +330,8 @@ public class InvoiceDAO {
 			System.out.println("Query=" + query);
 
 			statement.setString(1, notes);
-			statement.setString(2, docId);
+			statement.setString(2, totalOpenAmount);
+			statement.setString(3, docId);
 
 			isSuccess = statement.executeUpdate() > 0;
 			jdbcConnection.commit();

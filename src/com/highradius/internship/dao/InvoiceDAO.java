@@ -16,6 +16,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.highradius.internship.model.Invoice;
 import com.highradius.internship.utils.AppConstants;
 import com.highradius.internship.utils.DatabaseConnection;
@@ -188,13 +191,15 @@ public class InvoiceDAO {
 	}
 
 	// function to list 50 invoices
-	public List<Invoice> listInvoices() throws SQLException {
+	public List<Invoice> listInvoices(String pageCount) throws SQLException {
+//		InvoiceServlet obj = new InvoiceServlet();
+//		String sql = "SELECT * FROM invoice_details LIMIT 10 OFFSET 10";
 		String sql = AppConstants.LISTINVIOCES;
 		List<Invoice> invoiceList = new ArrayList<Invoice>();
-
 		try {
 			jdbcConnection = new DatabaseConnection().initializeDatabase();
 			statement = jdbcConnection.prepareStatement(sql);
+			statement.setInt(1, Integer.parseInt(pageCount));
 			rs = statement.executeQuery();
 
 			while (rs.next()) {
@@ -437,7 +442,7 @@ public class InvoiceDAO {
 			inv.setDocId(rs.getDouble("doc_id"));
 			inv.setPostingDate(rs.getDate("posting_date"));
 			inv.setDocumentCreateDate(rs.getDate("document_create_date"));
-			inv.setDueInDate(rs.getDate("posting_date"));
+			inv.setDueInDate(rs.getDate("due_in_date"));
 			inv.setInvoiceCurrency(rs.getString("invoice_currency"));
 			inv.setDocumentType(rs.getString("document_type"));
 			inv.setPostingId(rs.getDouble("posting_id"));
@@ -447,6 +452,7 @@ public class InvoiceDAO {
 			inv.setCustPaymentTerms(rs.getString("cust_payment_terms"));
 			inv.setInvoiceId(rs.getDouble("invoice_id"));
 			inv.setIsOpen(rs.getDouble("isOpen"));
+			inv.setNotes(rs.getString("notes"));
 		} catch (SQLException ex) {
 			printSQLException(ex);
 		} catch (Exception ex) {

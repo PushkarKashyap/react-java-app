@@ -8,12 +8,12 @@ public final class AppConstants {
 	public static final String DBNAME = "h2h_internship";
 	
 	//startup file location
-	public static final String CSV = "C:\\\\csvfile\\\\1806138.csv";
+	public static final String CSV = "C:\\csvfile\\1806138.csv";
 	public static final int BATCHSIZE = 500;
 	
-	//DB queries
+	//DB querie
 	public static final String LOADCSVQUERY = "INSERT  INTO invoice_details (business_code,cust_number,name_customer,clear_date,business_year,doc_id,posting_date,document_create_date,due_in_date,invoice_currency,document_type,posting_id,area_business,total_open_amount,baseline_create_date,cust_payment_terms,invoice_id,isOpen) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	public static final String LISTINVIOCES = "SELECT * FROM invoice_details LIMIT 50";
+	public static final String LISTINVIOCES = "SELECT * FROM invoice_details LIMIT 10 OFFSET ?";
 	public static final String SEARCHINVOICE = "SELECT * FROM invoice_details where invoice_id in (?)";
 	public static final String DELETEINVOICE = "DELETE FROM invoice_details where doc_id in (";
 	public static final String UPDATEINVOICE = "UPDATE invoice_details set notes = ? where doc_id = ?";

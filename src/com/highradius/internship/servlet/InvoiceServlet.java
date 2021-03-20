@@ -38,8 +38,8 @@ public class InvoiceServlet extends HttpServlet {
 		System.out.println("----------Initializing app-------------");
 		try {
 			//comment this if not required
-			InvoiceDAO invoiceDAO = new InvoiceDAO();
-			invoiceDAO.loadCSVonStartup();
+//			InvoiceDAO invoiceDAO = new InvoiceDAO();
+//			invoiceDAO.loadCSVonStartup();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ServletException(e);
@@ -64,8 +64,9 @@ public class InvoiceServlet extends HttpServlet {
 			throws ServletException, IOException {
 		// response.getWriter().append("Served at: ").append(request.getContextPath());
 		//String action = request.getServletPath();
+		
 		String action = request.getPathInfo();
-
+		System.out.println(action);
 		try {
 			switch (action) {
 			case "/add":
@@ -88,14 +89,17 @@ public class InvoiceServlet extends HttpServlet {
 			throw new ServletException(ex);
 		}
 	}
-
-	private void listInvoices(HttpServletRequest request, HttpServletResponse response)
+	
+	
+	
+	public void listInvoices(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, IOException {
 
 		List<Invoice> invoiceList = new ArrayList<Invoice>();
+		String pageCount = (request.getParameter("page")  == "") ? "0" : request.getParameter("page") ;
 		try {
 			InvoiceDAO invoiceDAO = new InvoiceDAO();
-			invoiceList = invoiceDAO.listInvoices();
+			invoiceList = invoiceDAO.listInvoices(pageCount);
 		} catch (Exception e) {
 			throw e;
 		}
@@ -126,7 +130,6 @@ public class InvoiceServlet extends HttpServlet {
 		response.setCharacterEncoding("UTF-8");
 		out.print(data);
 		out.flush();
-
 	}
 
 	private void searchInvoice(HttpServletRequest request, HttpServletResponse response)
@@ -170,10 +173,11 @@ public class InvoiceServlet extends HttpServlet {
 
 	private void addInvoice(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ParseException {
 		Invoice inv = new Invoice();
-		inv.setDocId(Double.parseDouble(request.getParameter("invoiceId")));
+		System.out.println(request.getParameter("docId")+request);
+		inv.setDocId(Double.parseDouble(request.getParameter("docId")));
 		inv.setNameCustomer(request.getParameter("nameCustomer"));
 		inv.setCustNumber(request.getParameter("custNumber"));
-		inv.setInvoiceId(Double.parseDouble(request.getParameter("invoiceId")));
+		inv.setInvoiceId(Double.parseDouble(request.getParameter("docId")));
 		inv.setTotalOpenAmount(Double.parseDouble(request.getParameter("totalOpenAmount")));
 		inv.setDueInDate(new Date(new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dueInDate")).getTime()));
 		inv.setNotes(request.getParameter("notes"));

@@ -37,7 +37,7 @@ public class InvoiceServlet extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		System.out.println("----------Initializing app-------------");
 		try {
-			//comment this if not required
+			// comment this if not required
 //			InvoiceDAO invoiceDAO = new InvoiceDAO();
 //			invoiceDAO.loadCSVonStartup();
 		} catch (Exception e) {
@@ -63,8 +63,8 @@ public class InvoiceServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// response.getWriter().append("Served at: ").append(request.getContextPath());
-		//String action = request.getServletPath();
-		
+		// String action = request.getServletPath();
+
 		String action = request.getPathInfo();
 		System.out.println(action);
 		try {
@@ -89,47 +89,48 @@ public class InvoiceServlet extends HttpServlet {
 			throw new ServletException(ex);
 		}
 	}
-	
-	
-	
+
 	public void listInvoices(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, IOException {
 
 		List<Invoice> invoiceList = new ArrayList<Invoice>();
-		String pageCount = (request.getParameter("page")  == "") ? "0" : request.getParameter("page") ;
+		String pageCount = "0";
+		if (request.getParameterMap().containsKey("page")) {
+			pageCount = (request.getParameter("page").isEmpty()) ? "0" : request.getParameter("page");
+		}
+
 		try {
 			InvoiceDAO invoiceDAO = new InvoiceDAO();
 			invoiceList = invoiceDAO.listInvoices(pageCount);
 		} catch (Exception e) {
 			throw e;
 		}
-		Gson gson = new Gson();
-		String data = gson.toJson(invoiceList);
-		PrintWriter out = response.getWriter();
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		out.print(data);
-		out.flush();
+		setOutput(invoiceList, request, response);
+		/*
+		 * Gson gson = new Gson(); String data = gson.toJson(invoiceList); PrintWriter
+		 * out = response.getWriter(); response.setContentType("application/json");
+		 * response.setCharacterEncoding("UTF-8"); out.print(data); out.flush();
+		 */
 	}
 
 	private void updateInvoice(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, IOException {
-		String docId =  request.getParameter("docId");
-		String notes =  request.getParameter("notes");
+		String docId = request.getParameter("docId");
+		String totalOpenAmount = request.getParameter("totalOpenAmount");
+		String notes = request.getParameter("notes");
 		boolean isSuccess = false;
 		try {
 			InvoiceDAO invoiceDAO = new InvoiceDAO();
-			isSuccess = invoiceDAO.updateInvoice(docId, notes);
+			isSuccess = invoiceDAO.updateInvoice(docId, totalOpenAmount, notes);
 		} catch (Exception e) {
 			throw e;
 		}
-		Gson gson = new Gson();
-		String data = gson.toJson(isSuccess);
-		PrintWriter out = response.getWriter();
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		out.print(data);
-		out.flush();
+		setOutput(isSuccess, request, response);
+		/*
+		 * Gson gson = new Gson(); String data = gson.toJson(isSuccess); PrintWriter out
+		 * = response.getWriter(); response.setContentType("application/json");
+		 * response.setCharacterEncoding("UTF-8"); out.print(data); out.flush();
+		 */
 	}
 
 	private void searchInvoice(HttpServletRequest request, HttpServletResponse response)
@@ -142,18 +143,17 @@ public class InvoiceServlet extends HttpServlet {
 		} catch (Exception e) {
 			throw e;
 		}
-		Gson gson = new Gson();
-		String data = gson.toJson(invoiceList);
-		PrintWriter out = response.getWriter();
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		out.print(data);
-		out.flush();
+		setOutput(invoiceList, request, response);
+		/*
+		 * Gson gson = new Gson(); String data = gson.toJson(invoiceList); PrintWriter
+		 * out = response.getWriter(); response.setContentType("application/json");
+		 * response.setCharacterEncoding("UTF-8"); out.print(data); out.flush();
+		 */
 	}
 
 	private void deleteInvoice(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, IOException {
-		String[] docList =  (request.getParameter("docList")).split("\\,");
+		String[] docList = (request.getParameter("docList")).split("\\,");
 		boolean isSuccess = false;
 		try {
 			InvoiceDAO invoiceDAO = new InvoiceDAO();
@@ -161,27 +161,27 @@ public class InvoiceServlet extends HttpServlet {
 		} catch (Exception e) {
 			throw e;
 		}
-		Gson gson = new Gson();
-		String data = gson.toJson(isSuccess);
-		PrintWriter out = response.getWriter();
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		out.print(data);
-		out.flush();
+		setOutput(isSuccess, request, response);
+		/*
+		 * Gson gson = new Gson(); String data = gson.toJson(isSuccess); PrintWriter out
+		 * = response.getWriter(); response.setContentType("application/json");
+		 * response.setCharacterEncoding("UTF-8"); out.print(data); out.flush();
+		 */
 
 	}
 
-	private void addInvoice(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ParseException {
+	private void addInvoice(HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, IOException, ParseException {
 		Invoice inv = new Invoice();
-		System.out.println(request.getParameter("docId")+request);
-		inv.setDocId(Double.parseDouble(request.getParameter("docId")));
+		inv.setDocId(Double.parseDouble(request.getParameter("invoiceId")));
 		inv.setNameCustomer(request.getParameter("nameCustomer"));
 		inv.setCustNumber(request.getParameter("custNumber"));
-		inv.setInvoiceId(Double.parseDouble(request.getParameter("docId")));
+		inv.setInvoiceId(Double.parseDouble(request.getParameter("invoiceId")));
 		inv.setTotalOpenAmount(Double.parseDouble(request.getParameter("totalOpenAmount")));
-		inv.setDueInDate(new Date(new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dueInDate")).getTime()));
+		inv.setDueInDate(
+				new Date(new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dueInDate")).getTime()));
 		inv.setNotes(request.getParameter("notes"));
-		
+
 		boolean isSuccess = false;
 		try {
 			InvoiceDAO invoiceDAO = new InvoiceDAO();
@@ -189,14 +189,24 @@ public class InvoiceServlet extends HttpServlet {
 		} catch (Exception e) {
 			throw e;
 		}
+		setOutput(isSuccess, request, response);
+		/*
+		 * Gson gson = new Gson(); String data = gson.toJson(isSuccess); PrintWriter out
+		 * = response.getWriter(); response.setContentType("application/json");
+		 * response.setCharacterEncoding("UTF-8"); out.print(data); out.flush();
+		 */
+
+	}
+
+	private void setOutput(Object ret, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, IOException {
 		Gson gson = new Gson();
-		String data = gson.toJson(isSuccess);
+		String data = gson.toJson(ret);
 		PrintWriter out = response.getWriter();
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		out.print(data);
 		out.flush();
-
 	}
 
 }

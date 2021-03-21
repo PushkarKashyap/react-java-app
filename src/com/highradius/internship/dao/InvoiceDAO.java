@@ -16,9 +16,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.highradius.internship.model.Invoice;
 import com.highradius.internship.utils.AppConstants;
 import com.highradius.internship.utils.DatabaseConnection;
@@ -190,11 +187,9 @@ public class InvoiceDAO {
 
 	}
 
-	// function to list 50 invoices
+	// function to list 10 invoices
 	public List<Invoice> listInvoices(String pageCount) throws SQLException {
-//		InvoiceServlet obj = new InvoiceServlet();
-//		String sql = "SELECT * FROM invoice_details LIMIT 10 OFFSET 10";
-		String sql = AppConstants.LISTINVIOCES;
+		String sql = AppConstants.LISTINVOICES;
 		List<Invoice> invoiceList = new ArrayList<Invoice>();
 		try {
 			jdbcConnection = new DatabaseConnection().initializeDatabase();
@@ -229,7 +224,7 @@ public class InvoiceDAO {
 
 		return invoiceList;
 	}
-	
+
 	public List<Invoice> searchInvoice(String invoiceId) throws SQLException {
 		String sql = AppConstants.SEARCHINVOICE;
 		List<Invoice> invoiceList = new ArrayList<Invoice>();
@@ -267,19 +262,20 @@ public class InvoiceDAO {
 
 		return invoiceList;
 	}
-	
-	//for dynamic query creation based on the number of inputs 
+
+	// for dynamic query creation based on the number of inputs
 	private static String createQuery(int length) {
 		String query = AppConstants.DELETEINVOICE;
 		StringBuilder queryBuilder = new StringBuilder(query);
-		for( int i = 0; i< length; i++){
+		for (int i = 0; i < length; i++) {
 			queryBuilder.append(" ?");
-			if(i != length -1) queryBuilder.append(",");
+			if (i != length - 1)
+				queryBuilder.append(",");
 		}
 		queryBuilder.append(")");
 		return queryBuilder.toString();
 	}
-	
+
 	public boolean deleteInvoice(String[] docList) throws SQLException {
 		boolean isSuccess = false;
 
@@ -289,12 +285,12 @@ public class InvoiceDAO {
 			String query = createQuery(docList.length);
 			PreparedStatement statement = jdbcConnection.prepareStatement(query);
 
-			System.out.println("Query="+query);
-			
-			for(int i = 1; i <=docList.length; i++){
-				statement.setString(i, docList[i-1]);
+			System.out.println("Query=" + query);
+
+			for (int i = 1; i <= docList.length; i++) {
+				statement.setString(i, docList[i - 1]);
 			}
-			
+
 			isSuccess = statement.executeUpdate() > 0;
 			jdbcConnection.commit();
 
@@ -321,8 +317,8 @@ public class InvoiceDAO {
 
 		return isSuccess;
 	}
-	
-	public boolean updateInvoice(String docId, String notes) throws SQLException {
+
+	public boolean updateInvoice(String docId, String totalOpenAmount, String notes) throws SQLException {
 		boolean isSuccess = false;
 
 		try {
@@ -330,11 +326,12 @@ public class InvoiceDAO {
 			jdbcConnection.setAutoCommit(false);
 			String query = AppConstants.UPDATEINVOICE;
 			statement = jdbcConnection.prepareStatement(query);
-			
-			System.out.println("Query="+query);
-			
+
+			System.out.println("Query=" + query);
+
 			statement.setString(1, notes);
-			statement.setString(2, docId);
+			statement.setString(2, totalOpenAmount);
+			statement.setString(3, docId);
 
 			isSuccess = statement.executeUpdate() > 0;
 			jdbcConnection.commit();
@@ -362,8 +359,7 @@ public class InvoiceDAO {
 
 		return isSuccess;
 	}
-	
-		
+
 	public boolean addInvoice(Invoice inv) throws SQLException {
 		boolean isSuccess = false;
 
@@ -372,16 +368,16 @@ public class InvoiceDAO {
 			jdbcConnection.setAutoCommit(false);
 			String query = AppConstants.ADDINVOICE;
 			statement = jdbcConnection.prepareStatement(query);
-			
-			System.out.println("Query="+query);
-			
+
+			System.out.println("Query=" + query);
+
 			statement.setDouble(1, inv.getDocId());
 			statement.setString(2, inv.getCustNumber());
 			statement.setString(3, inv.getNameCustomer());
 			statement.setDate(4, inv.getDueInDate());
-			statement.setDouble(5,  inv.getTotalOpenAmount());
-			statement.setDouble(6,  inv.getInvoiceId());
-			statement.setString(7,  inv.getNotes());
+			statement.setDouble(5, inv.getTotalOpenAmount());
+			statement.setDouble(6, inv.getInvoiceId());
+			statement.setString(7, inv.getNotes());
 
 			isSuccess = statement.executeUpdate() > 0;
 			jdbcConnection.commit();
@@ -481,12 +477,10 @@ public class InvoiceDAO {
 
 	// close connections
 	private void disconnect() throws SQLException {
-		if(rs != null && !rs.isClosed())
-		{
+		if (rs != null && !rs.isClosed()) {
 			rs.close();
 		}
-		if (statement != null && !statement.isClosed())
-		{
+		if (statement != null && !statement.isClosed()) {
 			statement.close();
 		}
 		if (jdbcConnection != null && !jdbcConnection.isClosed()) {
